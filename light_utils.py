@@ -2,6 +2,7 @@ import requests as rq
 import json
 import urllib3
 import light_specific_vars
+import time
 
 
 def change_power():
@@ -23,9 +24,9 @@ def change_power():
     response_json = a.json()
     light_on = response_json['data'][0]['on']['on']
     if light_on:
-        r = rq.put(light_url, headers=header, data=payload_off, verify=False)
+        rq.put(light_url, headers=header, data=payload_off, verify=False)
     else:
-        r = rq.put(light_url, headers=header, data=payload_on, verify=False)
+        rq.put(light_url, headers=header, data=payload_on, verify=False)
 
 
 def change_brightness(level):
@@ -43,3 +44,20 @@ def change_brightness(level):
         }
     })
     rq.put(url=light_url, headers=header, data=payload, verify=False)
+
+
+def change_color(x, y):
+    r = rq.put(light_specific_vars.light_url, headers=light_specific_vars.header,
+               json={
+                   "color": {
+                       "xy": {
+                           "x": x,
+                           "y": y
+                       }
+                   }
+               }, verify=False)
+    # print(it)
+    if (r.status_code == 200) or (r.status_code == 207):
+        pass
+    else:
+        print(r.status_code)

@@ -3,11 +3,21 @@ import time
 import sys
 import signal
 import light_utils
-import light_specific_vars
-# import w1thermsensor as w1
+import w1thermsensor as w1
+from colorsys import hsv_to_rgb
+from rgbxy import Converter
+from rgbxy import GamutC
+import urllib3
+
+converter = Converter(GamutC)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # Disable warning about insecure connection
 
 
 def translate_temp_to_hsv_color(value, temp_min, temp_max, hsv_color_min, hsv_color_max):
+    if value <= temp_min:
+        return hsv_color_min
+    elif value >= temp_max:
+        return hsv_color_max
     # Figure out how 'wide' each range is
     temp_span = temp_max - temp_min
     hsv_color_span = hsv_color_max - hsv_color_min
@@ -19,21 +29,34 @@ def translate_temp_to_hsv_color(value, temp_min, temp_max, hsv_color_min, hsv_co
     return hsv_color_min + (value_scaled * hsv_color_span)
 
 
-# def main():
-#     sensor = w1.W1ThermSensor()
-#     while True:
-#         temperature = sensor.get_temperature()
-#         print(temperature)
+def hsv2rgb(h, s, v):
+    return tuple(round(i * 255) for i in hsv_to_rgb(h, s, v))
+
+
+def hsv2xy(h):
+    r, g, b = hsv2rgb(h, 1, 1)
+    x, y = converter.rgb_to_xy(r, g, b)
+    return x, y
+
+
+def main():
+    sensor = w1.W1ThermSensor()
+    while True:
+        t = time.localtime()
+        temperature = sensor.get_temperature()
+        print(f'Temperature: {temperature}')
+        hue_value = translate_temp_to_hsv_color(temperature, 20, 30, 0.65, 0)
+        print(f'Translated hue (0-1) value based on that temperature: {hue_value}')
+        x, y = hsv2xy(hue_value)
+        print(f'x and y values: {x}, {y}')
+        print(time.strftime("%H:%M:%S", t))
+        print('--------------------------------------------------------------------------')
+        light_utils.change_color(x, y)
 
 
 if __name__ == '__main__':
     try:
-        # main()
-        temp = translate_temp_to_hsv_color(29.9, 20, 30, 0, 1)
-        print(temp)
+        main()
     except KeyboardInterrupt:
-        # GPIO.cleanup()
-        try:
-            sys.exit(130)
-        except SystemExit:
-            sys.exit(130)
+        quit()
+
