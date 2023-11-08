@@ -1,12 +1,27 @@
 import requests as rq
 import json
-import urllib3
 import light_specific_vars
-import time
+
+
+def check_response(response: rq.Response):
+    if (response.status_code != 200) and (response.status_code != 207):
+        print(f'There is something wrong with the API call! Status code: {response.status_code}')
+
+
+def check_if_powered_on():
+    header = light_specific_vars.header
+    light_url = light_specific_vars.light_url
+    r = rq.get(url=light_url, headers=header, verify=False)
+    check_response(r)
+    response_json = r.json()
+    light_on = response_json['data'][0]['on']['on']
+    if light_on:
+        return True
+    else:
+        return False
 
 
 def change_power():
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # Disable warning about insecure connection
     header = light_specific_vars.header
     light_url = light_specific_vars.light_url
     payload_on = json.dumps({
@@ -20,13 +35,13 @@ def change_power():
             "on": False
         }
     })
-    a = rq.get(url=light_url, headers=header, verify=False)
-    response_json = a.json()
-    light_on = response_json['data'][0]['on']['on']
-    if light_on:
-        rq.put(light_url, headers=header, data=payload_off, verify=False)
+    powered_on = check_if_powered_on()
+    if powered_on:
+        r = rq.put(light_url, headers=header, data=payload_off, verify=False)
+        check_response(r)
     else:
-        rq.put(light_url, headers=header, data=payload_on, verify=False)
+        r = rq.put(light_url, headers=header, data=payload_on, verify=False)
+        check_response(r)
 
 
 def change_brightness(level):
@@ -35,7 +50,6 @@ def change_brightness(level):
     elif level < 0:
         level = 0
 
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # Disable warning about insecure connection
     header = light_specific_vars.header
     light_url = light_specific_vars.light_url
     payload = json.dumps({
@@ -43,7 +57,8 @@ def change_brightness(level):
             "brightness": level
         }
     })
-    rq.put(url=light_url, headers=header, data=payload, verify=False)
+    r = rq.put(url=light_url, headers=header, data=payload, verify=False)
+    check_response(r)
 
 
 def change_color(x, y):
@@ -57,7 +72,4 @@ def change_color(x, y):
                    }
                }, verify=False)
     # print(it)
-    if (r.status_code == 200) or (r.status_code == 207):
-        pass
-    else:
-        print(r.status_code)
+    check_response(r)
