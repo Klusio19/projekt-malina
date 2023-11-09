@@ -1,7 +1,5 @@
 import RPi.GPIO as GPIO
 import time
-import sys
-import signal
 import light_utils
 import w1thermsensor as w1
 from colorsys import hsv_to_rgb
@@ -11,6 +9,7 @@ import urllib3
 
 converter = Converter(GamutC)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # Disable warning about insecure connection
+BUTTON = 14
 
 
 def translate_temp_to_hsv_color(value, temp_min, temp_max, hsv_color_min, hsv_color_max):
@@ -39,24 +38,47 @@ def hsv2xy(h):
     return x, y
 
 
-def main():
-    sensor = w1.W1ThermSensor()
+def button_callback(self):
+    light_utils.change_power()
+
+
+def cycle_colors():
+    print('CYCLE_COLORS_FUNCTION CALLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     while True:
+        if not light_utils.powered_on():
+            return
         t = time.localtime()
         temperature = sensor.get_temperature()
-        print(f'Temperature: {temperature}')
         hue_value = translate_temp_to_hsv_color(temperature, 20, 30, 0.65, 0)
-        print(f'Translated hue (0-1) value based on that temperature: {hue_value}')
         x, y = hsv2xy(hue_value)
+        print(f'Temperature: {temperature}')
+        print(f'Translated hue (0-1) value based on that temperature: {hue_value}')
         print(f'x and y values: {x}, {y}')
         print(time.strftime("%H:%M:%S", t))
         print('--------------------------------------------------------------------------')
         light_utils.change_color(x, y)
 
 
+def setup():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.add_event_detect(BUTTON, GPIO.RISING, button_callback, 500)
+    global sensor
+    sensor = w1.W1ThermSensor()
+
+
+def loop():
+    while True:
+        if light_utils.powered_on():
+            cycle_colors()
+        time.sleep(0.5)
+
+
 if __name__ == '__main__':
     try:
-        main()
-    except KeyboardInterrupt:
-        quit()
+        setup()
+        loop()
 
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+        quit()

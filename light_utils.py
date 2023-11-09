@@ -8,7 +8,7 @@ def check_response(response: rq.Response):
         print(f'There is something wrong with the API call! Status code: {response.status_code}')
 
 
-def check_if_powered_on():
+def powered_on():
     header = light_specific_vars.header
     light_url = light_specific_vars.light_url
     r = rq.get(url=light_url, headers=header, verify=False)
@@ -35,8 +35,7 @@ def change_power():
             "on": False
         }
     })
-    powered_on = check_if_powered_on()
-    if powered_on:
+    if powered_on():
         r = rq.put(light_url, headers=header, data=payload_off, verify=False)
         check_response(r)
     else:
