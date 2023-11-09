@@ -43,7 +43,6 @@ def button_callback(self):
 
 
 def cycle_colors():
-    print('CYCLE_COLORS_FUNCTION CALLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     while True:
         if not light_utils.powered_on():
             return
@@ -55,7 +54,7 @@ def cycle_colors():
         print(f'Translated hue (0-1) value based on that temperature: {hue_value}')
         print(f'x and y values: {x}, {y}')
         print(time.strftime("%H:%M:%S", t))
-        print('--------------------------------------------------------------------------')
+        print('------------------------------------------------------------------------')
         light_utils.change_color(x, y)
 
 
