@@ -1,4 +1,4 @@
-import RPi.GPIO as GPIO
+import gpiozero
 import time
 import light_utils
 import w1thermsensor as w1
@@ -9,7 +9,9 @@ import urllib3
 
 converter = Converter(GamutC)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # Disable warning about insecure connection
-BUTTON = 14
+button = gpiozero.Button(14)
+program_running_blue_led = gpiozero.LED(21)
+changing_colors_green_led = gpiozero.LED(20)
 
 
 def translate_temp_to_hsv_color(value, temp_min, temp_max, hsv_color_min, hsv_color_max):
@@ -45,6 +47,7 @@ def button_callback(self):
 def cycle_colors():
     while True:
         if not light_utils.powered_on():
+            changing_colors_green_led.off()
             return
         t = time.localtime()
         temperature = sensor.get_temperature()
@@ -59,9 +62,8 @@ def cycle_colors():
 
 
 def setup():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.add_event_detect(BUTTON, GPIO.RISING, button_callback, 500)
+    program_running_blue_led.on()
+    button.when_activated = button_callback
     global sensor
     sensor = w1.W1ThermSensor()
 
@@ -69,6 +71,7 @@ def setup():
 def loop():
     while True:
         if light_utils.powered_on():
+            changing_colors_green_led.on()
             cycle_colors()
         time.sleep(0.5)
 
@@ -79,5 +82,5 @@ if __name__ == '__main__':
         loop()
 
     except KeyboardInterrupt:
-        GPIO.cleanup()
+        program_running_blue_led.off()
         quit()
