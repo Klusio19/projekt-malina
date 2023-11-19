@@ -8,6 +8,7 @@ Simple Raspberry Pi Project, which uses some LEDs, buttons and DS18B20 temperatu
   * [Hardware setup](#hardware-setup)
   * [Software setup](#software-setup)
 * [Usage](#usage)
+* [Features](#features)
 
 ## General info
 This is a simple Raspberry Pi Project, which uses some LEDs, buttons and DS18B20 waterproof temperature sensor, all used on solderless breadboard to change Philips Hue lights based on the temperature, and additional few lighing modes.
