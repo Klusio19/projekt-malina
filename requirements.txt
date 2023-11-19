@@ -5,9 +5,6 @@ w1thermsensor
 colorzero
 numpy
 gpiozero
-install
 lgpio
 pigpio
-pip
 RPi.GPIO
-setuptools
