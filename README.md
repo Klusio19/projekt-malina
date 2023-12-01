@@ -45,7 +45,7 @@ Image of wiring all the parts:
   + Reboot the Raspberry, for example with `sudo systemctl reboot` or `sudo reboot`
 > [!IMPORTANT]
 > By default, if you enabled 1-wire interface, to make your 1-wire device work, you have to wire it to GPIO4. If you want to use other pin, you have to edit /boot/config.txt file for example with `sudo nano /boot/config.txt` and add at the end of the file: "gpiopin=xx", where xx is your chosen GPIO pin. So last line should look like this: `dtoverlay=w1-gpio,gpiopin=xx`.\
-> In this project I wired it up to GPIO 26, so last line looks like that: `dtoverlay=w1-gpio,gpiopin=xx`
+> In this project I wired it up to GPIO 26, so last line looks like that: `dtoverlay=w1-gpio,gpiopin=26`
 2. **Clone this repo**
   + `git clone https://github.com/Klusio19/projekt-malina`
   + `cd projekt-malina`
