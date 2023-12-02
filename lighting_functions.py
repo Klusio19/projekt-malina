@@ -28,6 +28,7 @@ def translate_temperature_to_hsv_color(value, temp_min, temp_max, hsv_color_min,
 def temperature_to_colors_cycle():
     if (not setup.powered_on_flag) or (not setup.temperature_to_colors_is_on_flag):
         return
+    setup.yellow_led.off()
     setup.green_led.on()
     os.system('cls' if os.name == 'nt' else 'clear')
     while True:

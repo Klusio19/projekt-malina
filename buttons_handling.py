@@ -32,7 +32,6 @@ def temperature_to_colors_cycle_button_pressed():
     if not setup.powered_on_flag:
         return
     setup.temperature_to_colors_is_on_flag = not setup.temperature_to_colors_is_on_flag
-    setup.yellow_led.off()
     setup.green_led.toggle()
     if setup.cycling_colors_is_on_flag:
         setup.cycling_colors_is_on_flag = False
