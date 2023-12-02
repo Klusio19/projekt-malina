@@ -18,10 +18,10 @@ def translate_temperature_to_hsv_color(value, temp_min, temp_max, hsv_color_min,
     temp_span = temp_max - temp_min
     hsv_color_span = hsv_color_max - hsv_color_min
 
-    # Convert the left range into a 0-1 range (float)
+    # Convert the temp range into a 0-1 range (float)
     value_scaled = float(value - temp_min) / float(temp_span)
 
-    # Convert the 0-1 range into a value in the right range.
+    # Convert the 0-1 range into a value in the hsv range.
     return hsv_color_min + (value_scaled * hsv_color_span)
 
 
